@@ -3,6 +3,7 @@ package io.mawulikwashigahazameti.viewmodeltesting
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import io.mawulikwashigahazameti.viewmodeltesting.databinding.ActivityCourtBinding
 
@@ -14,54 +15,41 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_court)
-        viewModel = ViewModelProvider(this).get(ScoreViewModel::class.java)
+        viewModel = ViewModelProvider(this)[ScoreViewModel::class.java]
 
-        displayForTeamA()
-        displayForTeamB()
+        // Get initial counting value ( equal to zero at the beginning of the app)
+        viewModel.scoreA().observe(this, Observer {
+            binding.scoreA.text = it.toString()
+        })
+        viewModel.scoreB().observe(this, Observer {
+            binding.scoreB.text = it.toString()
+        })
 
-
-        //Increase by one
+        //start counters
         binding.freeThrowA.setOnClickListener {
             viewModel.addOneA()
-            displayForTeamA()
+        }
+
+        binding.twoPointsA.setOnClickListener {
+            viewModel.addTwoA()
+        }
+
+        binding.threePointsA.setOnClickListener {
+            viewModel.addThreeA()
         }
 
         binding.freeThrowB.setOnClickListener {
             viewModel.addOneB()
-            displayForTeamB()
-        }
-
-        //Increase by two
-        binding.twoPointsA.setOnClickListener {
-            viewModel.addTwoA()
-            displayForTeamA()
         }
 
         binding.twoPointsB.setOnClickListener {
             viewModel.addTwoB()
-            displayForTeamB()
-        }
-
-        //Increase by three
-        binding.threePointsA.setOnClickListener {
-            viewModel.addThreeA()
-            displayForTeamA()
         }
 
         binding.threePointsB.setOnClickListener {
             viewModel.addThreeB()
-            displayForTeamB()
         }
 
-    }
-
-    //Displays the score of Team A
-    private fun displayForTeamA() {
-        binding.scoreA.text = viewModel.scoreA.toString()
-    }
-
-    //Displays the score of Team B
-    private fun displayForTeamB() {
-        binding.scoreB.text = viewModel.scoreB.toString()
+        binding.resetBtn.setOnClickListener { viewModel.reset() }
     }
 }
